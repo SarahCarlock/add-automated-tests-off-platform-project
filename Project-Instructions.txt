@@ -1,0 +1,82 @@
+GitHub Actions & Tutorial On Automated Testing
+
+In this article, you’ll learn about how GitHub Actions streamline the development workflow. You will also follow a tutorial that adds automated testing to a repository.
+Introduction
+
+Have you ever developed code that worked perfectly on your local computer (in development) but did not behave well when it went live (in production)? Or have you ever worked in a team where everyone promised the final version would work fine but ended up erroring? This is called the “works on my machine” syndrome in software development.
+
+Now imagine we could configure your GitHub repository to automatically run tests to verify the functionality of the codebase after each code change. Well… we can, using GitHub Actions!
+GitHub Actions
+
+GitHub Actions is a powerful, advanced GitHub feature that enables users to define custom and automated workflows triggered on various types of events such as pushing code or creating a pull request. The workflows execute inside a temporary container running in GitHub infrastructure.
+Tutorial: add automated testing to a repository
+
+In this tutorial project, you will use GitHub Actions to integrate automatic unit tests to a repository. You will fork a public repository that contains a sample bank application and add a configuration to trigger (already written) unit tests in the repository. Try your best to follow along!
+Bank account application
+
+The Bank Account repository contains Python Flask application code to manage the balance of an imaginary checking account. To understand this tutorial, you don’t need extensive Python knowledge or experience with the Flask framework. If you’re curious though, the README.md file includes more details about the code.
+Run tests on code push
+
+Now that we know what GitHub Actions are and how they enhance development workflows, let’s continue by adding an action to a repository. Start by forking and then cloning Codecademy’s Bank Account repository. Once you clone your forked copy of the repository from your GitHub account onto your local computer, create a new branch:
+
+git checkout -b "add-auto-tests"
+
+In your new branch, create a new directory and name it .github. Note that the dot in the beginning of the directory name is important. This is a keyword known to GitHub.
+
+Then create another directory inside the .github directory and name it workflows. GitHub looks for the definitions of GitHub Actions inside this directory.
+
+Create a new .yaml file inside the directory. Let’s name it unittests.yaml and paste the following content inside the file. Note that the indentation and spacing are important.
+
+name: Continuous Integration
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.0
+          architecture: x64
+      - name: Install dependencies
+        run: pip install -r requirements.txt 
+      - name: Run Tests
+        run: python -m pytest
+
+The file introduces a new GitHub Action named Continuous Integration that is triggered on push, meaning that everytime a developer pushes a code to a branch where this file exists. The action then runs the following steps in the order of their definition on an ubuntu-latest container:
+
+    Check out to the current Git branch.
+    Set up Python on the container.
+    Install the Python dependencies of the Bank Account app defined in requirements.txt.
+    Run the unit tests using Pytest.
+
+Add and commit your changes, then push the branch out to your remote repository on your GitHub account:
+
+git add . 
+git commit -a -m "added a GitHub action to run unit tests automatically on code push"
+git push --set-upstream origin "add-auto-tests"
+
+Now open your repository in a browser and navigate under the Actions tab. You should see a new workflow started a few seconds ago:
+
+"A new workflow being run in the GitHub Actions tab."
+
+Click on the workflow to show the details. The logs for every individual step are available:
+
+"Workflow details showing the log for every step taken in the GitHub action."
+
+Click through the steps to read the logs. Once the workflow finishes, you will see a green checkmark. If any of the unit tests fail, the workflow fails and you will see an email notification. You can try that by intentionally breaking one of the tests and pushing your code to your branch.
+Run tests on pull request creation
+
+Now let`s make this GitHub Action workflow also run the tests when creating a new pull request.
+
+Open unittests.yaml file and update the array of triggers to add pull_request:
+
+on: [push, pull_request]
+
+Commit and push your change to the branch. Notice that an instance of a container to run the tests will begin under the Actions tab just like before. But now, create a pull request from the add-auto-tests branch to your main branch (on your own repository). The GitHub action will then run as an automated check and ensure the unit tests pass. If the action fails, the pull request cannot be merged.
+
+"All GitHub actions have run and passed the pull request checks."
+Conclusion
+
+GitHub Actions enable automated workflows for developers. In this tutorial, we were able to add automated testing to a repository, which ensures quality control over the code. We encourage you to explore more GitHub Actions that can be configured to run other types of automation: docker builds, project compilation, tagging, releasing, and more!
